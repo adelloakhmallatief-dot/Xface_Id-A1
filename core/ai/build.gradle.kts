@@ -1,3 +1,4 @@
+import java.net.URI
 plugins {
     alias(libs.plugins.android.library)
 }
@@ -38,7 +39,7 @@ val downloadFaceDetectorModel = tasks.register("downloadFaceDetectorModel") {
     doLast {
         modelFile.parentFile.mkdirs()
         val partFile = File(modelFile.parentFile, modelFile.name + ".part")
-        java.net.URI(modelUrl).toURL().openStream().use { input ->
+        URI(modelUrl).toURL().openStream().use { input ->
             partFile.outputStream().use { output -> input.copyTo(output) }
         }
         check(partFile.renameTo(modelFile)) { "Gagal menyimpan model ke ${modelFile.path}" }
