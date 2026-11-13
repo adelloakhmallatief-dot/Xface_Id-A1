@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">XFace ID</string>
+    <string name="camera_permission_title">Izin kamera diperlukan</string>
+    <string name="camera_permission_body">XFace ID memakai kamera depan untuk mengenali wajahmu. Semua proses berjalan di perangkat, tanpa internet.</string>
+    <string name="camera_permission_button">Izinkan kamera</string>
+    <string name="camera_permission_denied">Izin kamera ditolak. Aktifkan lewat Pengaturan aplikasi untuk melanjutkan.</string>
+
+    <string name="model_load_failed">Model deteksi wajah belum tersedia. Jalankan build sekali dengan internet agar model terunduh ke assets, lalu coba lagi.</string>
+
+    <string name="registration_progress">Sampel %1$d dari %2$d</string>
+    <string name="registration_done">Pengambilan sampel selesai. Pemrosesan wajah menyusul di Fase 3.</string>
+    <string name="registration_retry">Ulangi</string>
+
+    <string name="issue_hold_still">Bagus, tahan sebentar…</string>
+    <string name="issue_no_face">Arahkan wajahmu ke kamera</string>
+    <string name="issue_multiple_faces">Hanya satu wajah ya</string>
+    <string name="issue_low_confidence">Wajah kurang jelas, cari cahaya yang lebih terang</string>
+    <string name="issue_too_far">Dekatkan wajahmu</string>
+    <string name="issue_too_close">Jauhkan sedikit</string>
+    <string name="issue_off_center">Posisikan wajah di tengah</string>
+    <string name="issue_not_frontal">Hadap lurus ke kamera</string>
+</resources>

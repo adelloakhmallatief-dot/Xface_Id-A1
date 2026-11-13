@@ -1,0 +1,37 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.DS_Store
+
+# Konfigurasi lokal (path SDK, dll.)
+local.properties
+
+# Keystore dan rahasia signing: JANGAN pernah di-commit
+*.jks
+*.keystore
+keystore.properties
+
+# Output build
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Capture / log
+captures/
+*.log
+.externalNativeBuild/
+.cxx/
+
+# Model AI diunduh otomatis saat build (task downloadFaceDetectorModel), tidak di-commit
+*.tflite
+*.tflite.part
+
+# Data wajah / embedding hasil uji lokal: jangan pernah masuk repo
+*.xfdb
+test_faces/
