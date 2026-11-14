@@ -17,7 +17,19 @@ Build pertama butuh internet untuk mengunduh model `blaze_face_short_range.tflit
 
 ## Mengunduh APK
 
-Setiap push ke `main` membangun APK otomatis lewat GitHub Actions. Buka tab **Actions**, pilih run terbaru, lalu unduh artifact `xface-id-apk` (berisi APK `standard` dan `lite`). APK ini berjenis debug dan hanya untuk uji coba di HP Android.
+Setiap build hijau di `main` menerbitkan APK otomatis ke rilis **Nightly**. Tidak perlu login atau ekstrak zip.
+
+| Edisi | Unduh langsung |
+|---|---|
+| Standard (disarankan) | [XFaceID-standard-debug.apk](https://github.com/adelloakhmallatief-dot/Xface_Id-A1/releases/download/nightly/XFaceID-standard-debug.apk) |
+| Lite | [XFaceID-lite-debug.apk](https://github.com/adelloakhmallatief-dot/Xface_Id-A1/releases/download/nightly/XFaceID-lite-debug.apk) |
+
+Semua berkas ada di halaman [Releases](https://github.com/adelloakhmallatief-dot/Xface_Id-A1/releases/tag/nightly). Cadangan: artifact `xface-id-apk` di tab **Actions** (berupa zip).
+
+Catatan:
+- APK ini berjenis **debug**, hanya untuk uji coba di HP Android (iPhone tidak bisa memasang APK).
+- Saat memasang, Android akan meminta izin "pasang dari sumber tak dikenal" untuk browser atau app File yang kamu pakai.
+- Tiap build ditandatangani kunci debug yang berbeda. Jika pemasangan update gagal, **hapus dulu versi lama** lalu pasang yang baru.
 
 ## Struktur
 

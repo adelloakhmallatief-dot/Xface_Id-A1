@@ -10,6 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    permissions:
+      contents: write # dibutuhkan untuk membuat GitHub Release
     steps:
       - uses: actions/checkout@v4
 
@@ -35,6 +37,23 @@ jobs:
           name: xface-id-apk
           path: app/build/outputs/apk/**/*.apk
           if-no-files-found: error
+
+      # Rilis "nightly": APK langsung (bukan zip), nama file tetap, ditimpa tiap build hijau di main.
+      - name: Publikasikan rilis nightly
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist
+          cp "$(find app/build/outputs/apk -name '*standard*debug*.apk' | head -n 1)" dist/XFaceID-standard-debug.apk
+          cp "$(find app/build/outputs/apk -name '*lite*debug*.apk' | head -n 1)" dist/XFaceID-lite-debug.apk
+          gh release delete nightly --cleanup-tag --yes --repo "$GITHUB_REPOSITORY" || true
+          gh release create nightly dist/*.apk \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Nightly build" \
+            --notes "Build otomatis dari commit ${GITHUB_SHA::7}. APK debug untuk uji coba di HP Android. Pakai XFaceID-standard-debug.apk."
 
       - name: Unit test
         run: gradle :core:ai:testDebugUnitTest --stacktrace
