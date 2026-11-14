@@ -41,12 +41,12 @@ Modul bertanda fase belum di-include di `settings.gradle.kts`. Tambahkan saat fa
 |---|---|
 | Android Gradle Plugin | 9.0.1 (butuh Gradle 9.1.0+, JDK 17+) |
 | Kotlin | 2.2.10 (built-in AGP 9, tanpa plugin kotlin-android) |
-| Compose (ui/foundation) | 1.12.1 |
+| Compose (ui/foundation) | 1.11.4 |
 | Material3 | 1.4.0 |
 | CameraX | 1.6.2 |
 | Activity Compose | 1.13.0 |
 | Core KTX | 1.18.0 |
-| Lifecycle | 2.11.0 |
+| Lifecycle | 2.10.0 |
 | MediaPipe tasks-vision | 0.10.35 (**belum terverifikasi** untuk Maven Android, cek saat sync) |
 | JUnit | 4.13.2 |
 

@@ -2,12 +2,12 @@
 # Versi diverifikasi dari developer.android.com / kotlinlang pada 7 Nov 2026.
 agp = "9.0.1"            # AGP 9.0 butuh Gradle 9.1.0+, Kotlin sudah built-in
 kotlin = "2.2.10"        # Sama dengan dependensi runtime KGP bawaan AGP 9.0
-compose = "1.12.1"       # compose.ui / foundation / runtime (stabil)
+compose = "1.11.4"       # Compose 1.12.x butuh AGP 9.1+ dan compileSdk 37 (terbukti gagal di CI)
 material3 = "1.4.0"      # compose.material3 (stabil)
 camerax = "1.6.2"        # CameraX stabil
 activityCompose = "1.13.0"
 coreKtx = "1.18.0"
-lifecycle = "2.11.0"
+lifecycle = "2.10.0"     # 2.11.0 butuh AGP 9.1+ (terbukti gagal di CI)
 # PERLU DICEK: halaman MediaPipe hanya menulis "latest.release" (bisa jatuh ke build lama
 # 0.20230731 yang salah urut). 0.10.35 saya ambil dari nomor rilis paket web MediaPipe,
 # belum terverifikasi untuk artefak Maven Android. Jika sync gagal, pakai 0.10.x terbaru
