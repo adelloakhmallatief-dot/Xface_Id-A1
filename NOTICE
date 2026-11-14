@@ -1,0 +1,10 @@
+XFace ID
+Copyright 2026 XCoder
+
+This product includes software developed by third parties under their own
+licenses (AndroidX, Jetpack Compose, CameraX, MediaPipe). Their licenses apply
+to those components.
+
+AI model files (for example the face detector .tflite) are NOT covered by the
+Apache License of this repository. They are downloaded at build time and keep
+the license of their original publisher.

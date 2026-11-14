@@ -65,3 +65,9 @@ Hasil yang diharapkan: layar minta izin kamera, lalu preview kamera depan penuh 
 - Tanpa cloud, tanpa API eksternal.
 - Frame kamera tidak pernah ditulis ke disk.
 - Lite dan Standard memakai core engine yang sama.
+
+## Lisensi
+
+Kode XFace ID dilisensikan di bawah [Apache License 2.0](LICENSE). Hak cipta 2026 XCoder.
+
+Berkas model AI (misalnya detektor wajah `.tflite`) tidak ikut lisensi ini dan tetap memakai lisensi penerbit aslinya. Lihat [NOTICE](NOTICE). Lisensi bobot model recognition dan anti-spoofing akan diperiksa di Fase 3 sebelum dipakai.
