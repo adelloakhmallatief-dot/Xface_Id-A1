@@ -18,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.xcoder.xfaceid.registration.RegistrationViewModel
+import com.xcoder.xfaceid.ui.HomeScreen
 import com.xcoder.xfaceid.ui.PermissionScreen
 import com.xcoder.xfaceid.ui.RegistrationScreen
 import com.xcoder.xfaceid.ui.XFaceTheme
@@ -60,7 +62,12 @@ private fun CameraGate() {
     }
 
     if (granted) {
-        RegistrationScreen(viewModel())
+        val scanViewModel: RegistrationViewModel = viewModel()
+        if (scanViewModel.unlocked) {
+            HomeScreen(onLockAgain = { scanViewModel.lockAgain() })
+        } else {
+            RegistrationScreen(scanViewModel)
+        }
     } else {
         PermissionScreen(
             denied = denied,

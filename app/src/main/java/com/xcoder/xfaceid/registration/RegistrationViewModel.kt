@@ -12,13 +12,16 @@ import com.xcoder.xfaceid.core.ai.detection.FaceFrame
 import com.xcoder.xfaceid.core.ai.detection.FaceQualityGate
 import com.xcoder.xfaceid.core.ai.detection.QualityIssue
 
-enum class RegistrationStage { SCANNING, DONE }
+/** SCANNING: mencari wajah. DONE: berhasil. FAILED: waktu habis tanpa wajah yang jelas, tampilkan "coba lagi". */
+enum class RegistrationStage { SCANNING, DONE, FAILED }
 
 /**
- * Alur registrasi Fase 2: kumpulkan [TARGET_SAMPLES] potongan wajah berkualitas baik.
+ * Alur pindai satu kali: begitu satu potongan wajah berkualitas baik didapat, langsung berhasil
+ * (lalu app membuka layar utama). Jika [SCAN_TIMEOUT_MS] habis tanpa hasil, gagal dan pengguna bisa mengulang.
  *
  * Potongan hanya disimpan di MEMORI. Fase 3 akan mengubahnya menjadi embedding
- * (MobileFaceNet), menyimpan embedding terenkripsi, lalu membuang potongan ini.
+ * (MobileFaceNet) lalu mencocokkannya dengan wajah terdaftar.
+ * CATATAN: sebelum Fase 3, "berhasil" hanya berarti ada wajah yang jelas, BUKAN verifikasi identitas.
  *
  * onFrame dipanggil dari thread analisis; state Compose aman ditulis dari thread lain.
  */
@@ -37,10 +40,15 @@ class RegistrationViewModel : ViewModel() {
     var debugInfo by mutableStateOf("menunggu frame pertama...")
         private set
 
+    /** True setelah pindai berhasil: app menampilkan layar utama. */
+    var unlocked by mutableStateOf(false)
+        private set
+
     private val gate = FaceQualityGate()
     private val samples = mutableListOf<Bitmap>()
     private var goodStreak = 0
     private var lastCaptureMs = 0L
+    private var scanStartMs = 0L
 
     private var frameCount = 0
     private var fpsWindowStart = 0L
@@ -55,9 +63,14 @@ class RegistrationViewModel : ViewModel() {
 
     @Synchronized
     fun onFrame(frame: FaceFrame, bitmap: Bitmap) {
-        if (stage == RegistrationStage.DONE) return
+        if (stage != RegistrationStage.SCANNING) return
 
         val now = SystemClock.elapsedRealtime()
+        if (scanStartMs == 0L) scanStartMs = now
+        if (now - scanStartMs > SCAN_TIMEOUT_MS) {
+            stage = RegistrationStage.FAILED
+            return
+        }
         frameCount++
         if (now - fpsWindowStart >= 1000L) {
             fps = frameCount
@@ -113,10 +126,22 @@ class RegistrationViewModel : ViewModel() {
         captured = 0
         goodStreak = 0
         lastCaptureMs = 0L
+        scanStartMs = 0L
         overlay = null
         issue = QualityIssue.NO_FACE
         lastError = null
         stage = RegistrationStage.SCANNING
+    }
+
+    /** Dipanggil UI setelah animasi berhasil selesai. */
+    fun unlock() {
+        if (stage == RegistrationStage.DONE) unlocked = true
+    }
+
+    /** Kembali ke pindai wajah (tombol "Kunci lagi"). */
+    fun lockAgain() {
+        unlocked = false
+        reset()
     }
 
     /** Dipakai Fase 3 untuk membuat embedding. Salinan daftar; bitmap tetap milik ViewModel sampai reset. */
@@ -128,7 +153,9 @@ class RegistrationViewModel : ViewModel() {
     }
 
     companion object {
-        const val TARGET_SAMPLES = 5
+        /** Cukup satu pindai yang jelas. */
+        const val TARGET_SAMPLES = 1
+        const val SCAN_TIMEOUT_MS = 15_000L
         private const val STEADY_FRAMES = 3
         private const val MIN_INTERVAL_MS = 500L
     }

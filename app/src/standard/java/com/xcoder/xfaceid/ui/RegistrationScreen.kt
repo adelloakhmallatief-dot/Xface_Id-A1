@@ -1,9 +1,6 @@
 package com.xcoder.xfaceid.ui
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -12,18 +9,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -47,9 +42,13 @@ import com.xcoder.xfaceid.core.camera.FaceFrameAnalyzer
 import com.xcoder.xfaceid.registration.RegistrationStage
 import com.xcoder.xfaceid.registration.RegistrationViewModel
 import com.xcoder.xfaceid.registration.issueMessageRes
+import kotlinx.coroutines.delay
 
-/** Panel debug sementara untuk uji coba. Ubah ke false sebelum rilis. Tahan lama logo untuk menyembunyikan. */
-private const val SHOW_DEBUG_DEFAULT = true
+/** Panel debug sementara untuk uji coba. Tersembunyi secara default; tahan lama logo untuk menampilkannya. */
+private const val SHOW_DEBUG_DEFAULT = false
+
+/** Jeda singkat agar animasi centang berhasil terlihat sebelum masuk. */
+private const val SUCCESS_HOLD_MS = 1000L
 
 @Composable
 fun RegistrationScreen(viewModel: RegistrationViewModel) {
@@ -58,7 +57,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel) {
     val engine = remember { runCatching { FaceDetectionEngine(context.applicationContext) }.getOrNull() }
 
     val done = viewModel.stage == RegistrationStage.DONE
-    val positive = viewModel.issue == null || done
+    val failed = viewModel.stage == RegistrationStage.FAILED
+    val positive = (viewModel.issue == null || done) && !failed
 
     Box(Modifier.fillMaxSize()) {
         AuroraBackground(positive = positive, modifier = Modifier.fillMaxSize())
@@ -66,7 +66,7 @@ fun RegistrationScreen(viewModel: RegistrationViewModel) {
         if (engine == null) {
             ModelMissing()
         } else {
-            RegistrationContent(viewModel, engine, done, positive)
+            RegistrationContent(viewModel, engine, done, failed, positive)
         }
     }
 }
@@ -76,10 +76,19 @@ private fun RegistrationContent(
     viewModel: RegistrationViewModel,
     engine: FaceDetectionEngine,
     done: Boolean,
+    failed: Boolean,
     positive: Boolean,
 ) {
     DisposableEffect(engine) {
         onDispose { engine.close() }
+    }
+
+    // Berhasil: beri waktu sebentar untuk animasi centang, lalu langsung masuk.
+    LaunchedEffect(done) {
+        if (done) {
+            delay(SUCCESS_HOLD_MS)
+            viewModel.unlock()
+        }
     }
 
     val analyzer = remember(engine, viewModel) {
@@ -122,9 +131,12 @@ private fun RegistrationContent(
             )
             Spacer(Modifier.height(20.dp))
             StatusCard(
-                messageRes = if (done) R.string.registration_done else issueMessageRes(viewModel.issue),
-                captured = viewModel.captured,
-                done = done,
+                messageRes = when {
+                    done -> R.string.scan_success
+                    failed -> R.string.scan_failed
+                    else -> issueMessageRes(viewModel.issue)
+                },
+                failed = failed,
                 onRetry = { viewModel.reset() },
             )
         }
@@ -176,9 +188,9 @@ private fun DebugPanel(text: String) {
     )
 }
 
-/** Kartu kaca (glass) berisi pesan arahan, progres sampel, dan tombol ulangi. */
+/** Kartu kaca (glass) berisi pesan arahan. Tombol "Coba lagi" hanya muncul saat pindai gagal. */
 @Composable
-private fun StatusCard(messageRes: Int, captured: Int, done: Boolean, onRetry: () -> Unit) {
+private fun StatusCard(messageRes: Int, failed: Boolean, onRetry: () -> Unit) {
     val shape = RoundedCornerShape(26.dp)
     Column(
         modifier = Modifier
@@ -200,53 +212,11 @@ private fun StatusCard(messageRes: Int, captured: Int, done: Boolean, onRetry: (
             )
         }
 
-        ProgressSegments(captured)
-
-        if (done) {
+        if (failed) {
             GradientButton(
                 text = stringResource(R.string.registration_retry),
                 onClick = onRetry,
             )
-        } else {
-            Text(
-                text = stringResource(
-                    R.string.registration_progress,
-                    captured,
-                    RegistrationViewModel.TARGET_SAMPLES,
-                ),
-                color = XColors.TextSecondary,
-                fontSize = 12.sp,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ProgressSegments(captured: Int) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        repeat(RegistrationViewModel.TARGET_SAMPLES) { index ->
-            val fill by animateFloatAsState(
-                targetValue = if (index < captured) 1f else 0f,
-                animationSpec = spring(stiffness = Spring.StiffnessLow),
-                label = "segment-$index",
-            )
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(6.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.12f)),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(fill.coerceIn(0f, 1f))
-                        .fillMaxHeight()
-                        .background(Brush.horizontalGradient(listOf(XColors.Cyan, XColors.Mint))),
-                )
-            }
         }
     }
 }

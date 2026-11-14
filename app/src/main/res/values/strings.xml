@@ -11,7 +11,15 @@
 
     <string name="registration_progress">Sampel %1$d dari %2$d</string>
     <string name="registration_done">Pengambilan sampel selesai. Pemrosesan wajah menyusul di Fase 3.</string>
-    <string name="registration_retry">Ulangi</string>
+    <string name="registration_retry">Coba lagi</string>
+
+    <string name="scan_success">Berhasil! Membuka…</string>
+    <string name="scan_failed">Wajah belum terbaca jelas. Coba lagi.</string>
+
+    <string name="home_title">Terbuka</string>
+    <string name="home_subtitle">Wajah terdeteksi. Selamat datang!</string>
+    <string name="home_demo_note">Mode uji: pengenalan wajah belum aktif, jadi saat ini wajah apa pun yang terdeteksi bisa masuk. Pencocokan dengan wajah terdaftar dan anti-spoofing hadir di Fase 3.</string>
+    <string name="home_lock">Kunci lagi</string>
 
     <string name="issue_hold_still">Bagus, tahan sebentar…</string>
     <string name="issue_no_face">Arahkan wajahmu ke kamera</string>
