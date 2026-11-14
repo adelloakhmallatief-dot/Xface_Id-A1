@@ -33,7 +33,9 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
 
     // CameraX. camera-view menyediakan PreviewView, dipakai lewat AndroidView.
-    implementation(libs.androidx.camera.core)
+    // api: tipe ImageAnalysis.Analyzer muncul di API publik FaceFrameAnalyzer / CameraPreview,
+    // jadi modul yang memakainya (:app) harus melihatnya di classpath.
+    api(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
