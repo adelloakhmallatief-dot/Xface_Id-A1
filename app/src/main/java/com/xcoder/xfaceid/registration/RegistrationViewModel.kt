@@ -33,18 +33,48 @@ class RegistrationViewModel : ViewModel() {
     var captured by mutableIntStateOf(0)
         private set
 
+    /** Teks diagnostik sementara untuk uji coba di HP (fps, ukuran frame, angka kualitas, error). */
+    var debugInfo by mutableStateOf("menunggu frame pertama...")
+        private set
+
     private val gate = FaceQualityGate()
     private val samples = mutableListOf<Bitmap>()
     private var goodStreak = 0
     private var lastCaptureMs = 0L
 
+    private var frameCount = 0
+    private var fpsWindowStart = 0L
+    private var fps = 0
+    private var lastError: String? = null
+
+    /** Dipanggil analyzer bila satu frame gagal diproses. */
+    @Synchronized
+    fun onError(t: Throwable) {
+        lastError = "${t.javaClass.simpleName}: ${t.message}".take(140)
+    }
+
     @Synchronized
     fun onFrame(frame: FaceFrame, bitmap: Bitmap) {
         if (stage == RegistrationStage.DONE) return
 
+        val now = SystemClock.elapsedRealtime()
+        frameCount++
+        if (now - fpsWindowStart >= 1000L) {
+            fps = frameCount
+            frameCount = 0
+            fpsWindowStart = now
+        }
+
         overlay = frame
         val quality = gate.evaluate(frame.faces)
         issue = quality.issue
+
+        debugInfo = buildString {
+            append("fps=$fps  ${frame.imageWidth}x${frame.imageHeight}  streak=$goodStreak\n")
+            append(gate.describe(frame.faces)).append('\n')
+            append("masalah=${quality.issue ?: "tidak ada"}")
+            lastError?.let { append("\nerror: $it") }
+        }
 
         val face = quality.face
         if (!quality.isGood || face == null) {
@@ -53,10 +83,20 @@ class RegistrationViewModel : ViewModel() {
         }
 
         goodStreak++
-        val now = SystemClock.elapsedRealtime()
         if (goodStreak < STEADY_FRAMES || now - lastCaptureMs < MIN_INTERVAL_MS) return
 
-        val crop = FaceCropper.crop(bitmap, face.box) ?: return
+        val crop = try {
+            FaceCropper.crop(bitmap, face.box)
+        } catch (e: Exception) {
+            lastError = "crop: ${e.javaClass.simpleName}: ${e.message}".take(140)
+            null
+        }
+        if (crop == null) {
+            // Jangan mengulang tanpa henti dengan streak penuh; mulai hitung lagi.
+            goodStreak = 0
+            return
+        }
+
         samples += crop
         captured = samples.size
         lastCaptureMs = now
@@ -75,6 +115,7 @@ class RegistrationViewModel : ViewModel() {
         lastCaptureMs = 0L
         overlay = null
         issue = QualityIssue.NO_FACE
+        lastError = null
         stage = RegistrationStage.SCANNING
     }
 

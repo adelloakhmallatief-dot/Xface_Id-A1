@@ -59,12 +59,18 @@ class FaceQualityGate(private val config: QualityConfig = QualityConfig()) {
 
     /** Perkiraan menghadap depan dari mata dan hidung. Jika landmark tidak lengkap, dianggap tidak frontal. */
     private fun isFrontal(face: DetectedFace): Boolean {
-        val re = face.rightEye ?: return false
-        val le = face.leftEye ?: return false
-        val nose = face.nose ?: return false
+        val (yawRatio, rollDegrees) = yawAndRoll(face) ?: return false
+        return yawRatio <= config.maxYawRatio && rollDegrees <= config.maxRollDegrees
+    }
+
+    /** Pasangan (rasio yaw, derajat roll), atau null bila landmark tidak lengkap. */
+    private fun yawAndRoll(face: DetectedFace): Pair<Float, Float>? {
+        val re = face.rightEye ?: return null
+        val le = face.leftEye ?: return null
+        val nose = face.nose ?: return null
 
         val eyeDist = abs(le.x - re.x)
-        if (eyeDist < 1e-3f) return false
+        if (eyeDist < 1e-3f) return null
 
         val eyeMidX = (le.x + re.x) / 2f
         val yawRatio = abs(nose.x - eyeMidX) / eyeDist
@@ -73,6 +79,19 @@ class FaceQualityGate(private val config: QualityConfig = QualityConfig()) {
             atan2((le.y - re.y).toDouble(), eyeDist.toDouble()),
         ).let { abs(it).toFloat() }
 
-        return yawRatio <= config.maxYawRatio && rollDegrees <= config.maxRollDegrees
+        return yawRatio to rollDegrees
+    }
+
+    /** Ringkasan angka untuk panel debug di layar (sementara, untuk uji coba). */
+    fun describe(faces: List<DetectedFace>): String {
+        if (faces.isEmpty()) return "wajah=0"
+        if (faces.size > 1) return "wajah=${faces.size}"
+        val f = faces.first()
+        val yr = yawAndRoll(f)
+        val yaw = yr?.first?.let { "%.2f".format(java.util.Locale.US, it) } ?: "-"
+        val roll = yr?.second?.let { "%.0f".format(java.util.Locale.US, it) } ?: "-"
+        return "skor=%.2f lebar=%.2f x=%.2f y=%.2f yaw=%s roll=%s".format(
+            java.util.Locale.US, f.score, f.box.width, f.box.centerX, f.box.centerY, yaw, roll,
+        )
     }
 }

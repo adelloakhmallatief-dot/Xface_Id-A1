@@ -22,6 +22,7 @@ private const val TAG = "XFaceAnalyzer"
  */
 class FaceFrameAnalyzer(
     private val engine: FaceDetectionEngine,
+    private val onError: (Throwable) -> Unit = {},
     private val onFrame: (frame: FaceFrame, bitmap: Bitmap) -> Unit,
 ) : ImageAnalysis.Analyzer {
 
@@ -38,6 +39,7 @@ class FaceFrameAnalyzer(
             onFrame(engine.detect(upright), upright)
         } catch (e: Exception) {
             Log.e(TAG, "Gagal menganalisis frame", e)
+            onError(e)
         } finally {
             image.close()
         }
