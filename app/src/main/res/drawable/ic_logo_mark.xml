@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Logo XFace ID, dari sketsa XCoder: bingkai pojok ala Face ID, dua mata, senyum, dan topi di atas.
+    Satu warna (tanpa gradien) supaya bisa dipakai juga sebagai ikon monochrome (tema ikon Android 13+).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <!-- Topi, sedikit miring seperti di sketsa -->
+    <group
+        android:pivotX="32"
+        android:pivotY="22"
+        android:rotation="-6">
+        <path
+            android:fillColor="#00000000"
+            android:pathData="M22,22 L24,10 L40,10 L42,22"
+            android:strokeColor="#86DDEB"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:strokeWidth="3" />
+        <path
+            android:fillColor="#00000000"
+            android:pathData="M12,23 Q32,20 52,23"
+            android:strokeColor="#86DDEB"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:strokeWidth="3" />
+    </group>
+
+    <!-- Empat bracket pojok -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M12,38 L12,34 Q12,30 16,30 L20,30 M44,30 L48,30 Q52,30 52,34 L52,38 M12,54 L12,58 Q12,62 16,62 L20,62 M44,62 L48,62 Q52,62 52,58 L52,54"
+        android:strokeColor="#86DDEB"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="3" />
+
+    <!-- Mata -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M24,42 L24,47 M40,42 L40,47"
+        android:strokeColor="#86DDEB"
+        android:strokeLineCap="round"
+        android:strokeWidth="3" />
+
+    <!-- Senyum -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M23,52 Q32,58 41,52"
+        android:strokeColor="#86DDEB"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="3" />
+</vector>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">XFace ID</string>
+    <string name="app_tagline">QUICK UNLOCK · 100% OFFLINE</string>
     <string name="camera_permission_title">Izin kamera diperlukan</string>
     <string name="camera_permission_body">XFace ID memakai kamera depan untuk mengenali wajahmu. Semua proses berjalan di perangkat, tanpa internet.</string>
     <string name="camera_permission_button">Izinkan kamera</string>
